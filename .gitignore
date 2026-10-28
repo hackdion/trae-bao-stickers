@@ -12,3 +12,4 @@ node_modules/
 *.key
 *.log
 /Seed自由创作工作树/
+/.trae-html-share-packages/

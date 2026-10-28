@@ -1,0 +1,26 @@
+=== 构建 2026-10-28 14:26:19 ===
+01 收到: 24帧 1.20s GIF 1.34MiB WEBP 0.59MiB
+02 思考: 30帧 1.50s GIF 2.04MiB WEBP 1.03MiB
+03 震惊: 24帧 0.96s GIF 2.51MiB WEBP 0.80MiB
+04 累瘫: 32帧 1.92s GIF 2.17MiB WEBP 0.74MiB
+05 冲刺: 20帧 0.80s GIF 2.83MiB WEBP 0.96MiB
+06 辛苦啦: 30帧 1.50s GIF 1.28MiB WEBP 0.68MiB
+
+=== 质检 ===
+01 收到    GIF 512x512 24帧 1200ms 1.34MiB | 帧变化占比 min 1.13% mean 9.9% | 首尾 0.11/1.2% | WEBP 0.59MiB | OK
+02 思考    GIF 512x512 30帧 1500ms 2.04MiB | 帧变化占比 min 0.59% mean 10.7% | 首尾 1.92/16.5% | WEBP 1.03MiB | OK
+03 震惊    GIF 512x512 24帧 960ms 2.51MiB | 帧变化占比 min 0.96% mean 24.0% | 首尾 0.08/1.1% | WEBP 0.80MiB | OK
+04 累瘫    GIF 512x512 32帧 1920ms 2.17MiB | 帧变化占比 min 3.57% mean 10.9% | 首尾 0.49/3.9% | WEBP 0.74MiB | OK
+05 冲刺    GIF 512x512 20帧 800ms 2.83MiB | 帧变化占比 min 24.42% mean 37.5% | 首尾 5.08/32.8% | WEBP 0.96MiB | OK
+06 辛苦啦   GIF 512x512 30帧 1500ms 1.28MiB | 帧变化占比 min 2.41% mean 8.4% | 首尾 0.17/2.8% | WEBP 0.68MiB | OK
+
+共 6 张，异常 0 张。报告：/Users/hackdion/Desktop/TRAE宝表情包大赛/TRAE重制版/检查报告.json
+
+=== 展示图 ===
+预览_六宫格.png (1472, 1178)
+对照_旧版与重制.png (1536, 668)
+分镜 6 张
+遮罩核对图 6 张
+
+=== 预览页 ===
+预览.html 19324 bytes

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRAE宝 · Seed自由创作版 · 01 收到！ 样稿预览</title>
+<style>
+  :root{ --ink:#0d403a; --mint:#34d6c3; --bg:#eefaf7; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Sans GB","PingFang SC",system-ui,sans-serif;background:
+      radial-gradient(900px 500px at 15% -5%,#d9f3ee 0%,transparent 60%),
+      radial-gradient(800px 500px at 110% 20%,#e6f7f3 0%,transparent 55%),var(--bg);
+      color:var(--ink);}
+  header{max-width:1080px;margin:0 auto;padding:40px 24px 8px}
+  h1{font-size:26px;margin:0 0 6px}
+  .sub{color:#3f6f68;font-size:14px}
+  main{max-width:1080px;margin:0 auto;padding:18px 24px 60px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+  .card{background:#fff;border:1px solid #d7ece8;border-radius:20px;padding:18px;
+        box-shadow:0 10px 30px rgba(13,64,58,.08)}
+  .card h2{font-size:16px;margin:0 0 2px}
+  .card .meta{font-size:12px;color:#6b938c;margin-bottom:12px}
+  .stage{aspect-ratio:1/1;width:100%;border-radius:14px;overflow:hidden;background:#d8efe9;
+         display:flex;align-items:center;justify-content:center}
+  .stage img{width:100%;height:100%;object-fit:contain;display:block}
+  .specs{font-size:12.5px;color:#38635c;margin-top:10px;line-height:1.7}
+  .specs b{color:var(--ink)}
+  .strip{margin-top:26px;background:#fff;border:1px solid #d7ece8;border-radius:20px;padding:18px}
+  .strip h2{font-size:16px;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:6px}
+  .grid img{width:100%;border-radius:6px;background:#d8efe9}
+  footer{max-width:1080px;margin:0 auto;padding:0 24px 40px;color:#6b938c;font-size:12px;line-height:1.8}
+  code{background:#e2f2ee;padding:1px 6px;border-radius:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>TRAE宝 · Seed 自由创作版 — 01「收到！」动态样稿</h1>
+  <div class="sub">512×512 · 1:1 · 48 帧 · 40ms · 1.92s 无缝循环 · 黑色方屏头 / 青色菱形眼 / 真关节敬礼</div>
+</header>
+<main>
+  <div class="cards">
+    <section class="card">
+      <h2>动态 GIF</h2>
+      <div class="meta">通用格式 · 1.52MB · 128 色</div>
+      <div class="stage"><img src="01_收到/输出/01_收到_动态.gif" alt="收到 动态GIF" width="512" height="512"></div>
+      <div class="specs">loop=0 无限循环；文字与对勾在聊天小窗仍清晰。</div>
+    </section>
+    <section class="card">
+      <h2>全彩动态 WebP</h2>
+      <div class="meta">推荐 · 0.44MB · 全彩无抖动</div>
+      <div class="stage"><img src="01_收到/输出/01_收到_动态.webp" alt="收到 动态WebP" width="512" height="512"></div>
+      <div class="specs">48 个 ANMF 帧，每帧时长 40ms，loop=0。</div>
+    </section>
+    <section class="card">
+      <h2>PNG 静帧（f20 峰值）</h2>
+      <div class="meta">105KB · 可直接做静态表情</div>
+      <div class="stage"><img src="01_收到/输出/01_收到_静帧.png" alt="收到 静帧" width="512" height="512"></div>
+      <div class="specs">敬礼到位 + 屏幕对勾 +「收到！」气泡同框。</div>
+    </section>
+  </div>
+
+  <section class="strip">
+    <h2>48 帧时间轴（f0 → f47，f48 回到 f0）</h2>
+    <div class="grid" id="strip"></div>
+  </section>
+</main>
+<footer>
+  工作树：<code>/Users/hackdion/Desktop/TRAE宝表情包大赛/Seed自由创作工作树</code>（分支 <code>seed/创作-收到样稿</code>）<br>
+  脚本：<code>Seed自由创作版/01_收到/脚本/render_shoudao.py</code>（python3 一键复现）·
+  制作与检查记录见 <code>01_收到/过程记录/</code>
+</footer>
+<script>
+  const g=document.getElementById('strip');
+  for(let i=0;i<48;i++){
+    const im=new Image();
+    im.src='01_收到/源文件/thumbs/t_'+String(i).padStart(3,'0')+'.jpg';
+    im.title='f'+i; g.appendChild(im);
+  }
+</script>
+</body>
+</html>

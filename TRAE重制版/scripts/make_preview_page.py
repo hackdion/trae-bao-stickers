@@ -1,0 +1,367 @@
+"""
+生成本地可打开的动画预览页 预览.html。
+页面中的规格数字全部读取自实际构建产物与 检查报告.json，不手工填写。
+
+用法：python scripts/make_preview_page.py
+"""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from build_remaster import SPECS  # noqa: E402
+from make_previews import ACTIONS  # noqa: E402
+
+DETAIL = {
+    "01": ("手臂（绕肩肘支点放大上抬）", "屏幕眼睛", "速度线、星光呼吸、边缘光"),
+    "02": ("托腮手、涂鸦圈", "屏幕眼睛", "灯泡光晕与放射线、咖啡热气"),
+    "03": ("三张飞散纸片", "屏幕眼睛", "冲击闪光、边框集中线、火星"),
+    "04": ("整个头部（以桌面接触点为轴压缩）", "屏幕眼睛", "热气、低电量红光、屏幕断电"),
+    "05": ("披风（边界钉住的位移场）", "屏幕眼睛", "扬尘、速度线、跑步节拍推近"),
+    "06": ("无（爱心本体保持原样，见下方说明）", "屏幕眼睛（心跳同步）", "描边爱心上浮、暖光/红光呼吸、屏幕反光"),
+}
+
+LAYER_NOTE = {
+    "01": "手臂只放大不挖空，放大后的图层完整盖住原袖口，因此没有接缝或抹平色块。",
+    "02": "手部以手腕为轴小幅摆动并叠加 3% 放大，保证覆盖原位；涂鸦绕自身中心旋转。",
+    "03": "纸片绕各自中心旋转并随冲击放大，既不会露出底板，也保留纸张纹理。",
+    "04": "头部沿桌面接触点做压缩，顶边下移露出的窄缝由 inpaint 补齐；眼睛跟随同一变换并调暗。",
+    "05": "披风用逐像素位移场，位移在披风边界衰减为 0，所以边缘不会裂开。",
+    "06": "像素爱心被两只手套夹住且与背景同色，几何放大会在凹形边界留下重影；因此不做整体缩放，改用光晕跳动与描边爱心上浮表达送心。",
+}
+
+
+def load_report():
+    p = ROOT / "检查报告.json"
+    if not p.exists():
+        return {}
+    return {r["id"]: r for r in json.loads(p.read_text(encoding="utf-8"))}
+
+
+def human(n):
+    return f"{n/1048576:.2f} MiB"
+
+
+def cards_html():
+    rep = load_report()
+    out = []
+    for sp in SPECS:
+        r = rep.get(sp.sid, {})
+        g = r.get("gif", {})
+        w = r.get("webp", {})
+        layers, eye, fx = DETAIL[sp.sid]
+        out.append(f"""
+      <article class="card" data-gif="gif/{sp.sid}_{sp.name}.gif" data-still="png/{sp.sid}_{sp.name}.png"
+               data-webp="webp/{sp.sid}_{sp.name}.webp">
+        <div class="shot">
+          <img class="anim" src="webp/{sp.sid}_{sp.name}.webp" alt="{sp.name} 动态表情">
+          <span class="num">{sp.sid}</span>
+          <span class="chipy">{sp.name}</span>
+        </div>
+        <div class="meta">
+          <div class="specs">
+            <span>{g.get('frames', sp.frames)} 帧</span>
+            <span>{g.get('duration_ms', 0)/1000:.2f}s</span>
+            <span>512×512</span>
+            <span>GIF {human(g.get('bytes', 0))}</span>
+            <span>WebP {human(w.get('bytes', 0))}</span>
+          </div>
+          <p class="act">{ACTIONS[sp.sid]}</p>
+          <ul class="facts">
+            <li><b>运动图层</b>{layers}</li>
+            <li><b>同步图层</b>{eye}</li>
+            <li><b>叠加特效</b>{fx}</li>
+          </ul>
+          <p class="note">{LAYER_NOTE[sp.sid]}</p>
+          <div class="links">
+            <a href="gif/{sp.sid}_{sp.name}.gif">GIF</a>
+            <a href="webp/{sp.sid}_{sp.name}.webp">WebP</a>
+            <a href="png/{sp.sid}_{sp.name}.png">PNG</a>
+          </div>
+        </div>
+      </article>""")
+    return "\n".join(out)
+
+
+def table_rows():
+    rep = load_report()
+    rows = []
+    for sp in SPECS:
+        r = rep.get(sp.sid, {})
+        g = r.get("gif", {})
+        m = r.get("motion", {})
+        ok = "通过" if not r.get("problems") else "；".join(r["problems"])
+        rows.append(f"""        <tr>
+          <td>{sp.sid} {sp.name}</td>
+          <td>{g.get('size', [0,0])[0]}×{g.get('size', [0,0])[1]}</td>
+          <td>{g.get('frames', 0)}</td>
+          <td>{g.get('duration_ms', 0)} ms</td>
+          <td>{human(g.get('bytes', 0))}</td>
+          <td>{m.get('min_changed_pixel_ratio', 0)*100:.2f}% / {m.get('mean_changed_pixel_ratio', 0)*100:.1f}%</td>
+          <td>{m.get('loop_seam_diff_first_vs_last', 0):.2f}</td>
+          <td class="ok">{ok}</td>
+        </tr>""")
+    return "\n".join(rows)
+
+
+def strips_html():
+    items = []
+    for sp in SPECS:
+        items.append(f"""      <figure class="stripf">
+        <img src="过程截图/分镜_{sp.sid}_{sp.name}.png" alt="{sp.name} 动作分镜">
+        <figcaption>{sp.sid} {sp.name} · 6 个时间点的真实渲染帧</figcaption>
+      </figure>""")
+    return "\n".join(items)
+
+
+def masks_html():
+    items = []
+    for sp in SPECS:
+        items.append(f"""      <figure>
+        <img src="过程截图/遮罩_{sp.sid}_{sp.name}.png" alt="{sp.name} 遮罩核对">
+        <figcaption>遮罩核对：红=运动图层，绿=屏幕眼睛，黄=辅助图层</figcaption>
+      </figure>""")
+    return "\n".join(items)
+
+
+HTML = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRAE宝 · 六连发表情包（重制版）</title>
+<style>
+  :root {{
+    --bg:#0c0e13; --panel:#14171e; --panel2:#1a1e27; --line:#262b36;
+    --text:#eef1f6; --dim:#9aa3b2; --orange:#ff8a3d; --mint:#6ef0c8;
+  }}
+  * {{ box-sizing:border-box; }}
+  body {{ margin:0; background:var(--bg); color:var(--text);
+         font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+         -webkit-font-smoothing:antialiased; }}
+  a {{ color:var(--mint); text-decoration:none; }}
+  header {{ padding:56px 40px 28px; max-width:1560px; margin:0 auto; }}
+  .kicker {{ color:var(--orange); font-size:13px; letter-spacing:.24em; text-transform:uppercase; }}
+  h1 {{ font-size:clamp(28px,3.4vw,46px); margin:12px 0 10px; letter-spacing:-.01em; }}
+  .lede {{ color:var(--dim); font-size:15px; line-height:1.8; max-width:900px; }}
+  .lede b {{ color:var(--text); font-weight:600; }}
+  .bar {{ display:flex; gap:10px; flex-wrap:wrap; margin-top:22px; }}
+  button {{ background:var(--panel2); color:var(--text); border:1px solid var(--line);
+            border-radius:10px; padding:9px 15px; font-size:13px; cursor:pointer; }}
+  button:hover {{ border-color:#3a4250; }}
+  button.on {{ background:#2a2018; border-color:#5a3a20; color:#ffc79a; }}
+  main {{ max-width:1560px; margin:0 auto; padding:0 40px 80px; }}
+  .grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(380px,1fr)); gap:22px; }}
+  .card {{ background:var(--panel); border:1px solid var(--line); border-radius:18px;
+           overflow:hidden; display:flex; flex-direction:column; }}
+  .shot {{ position:relative; aspect-ratio:1/1; background:#0a0b0f; }}
+  .shot img {{ width:100%; height:100%; display:block; object-fit:cover; }}
+  .num {{ position:absolute; top:14px; left:14px; font-size:12px; letter-spacing:.12em;
+          background:rgba(8,10,14,.66); border:1px solid rgba(255,255,255,.14);
+          padding:4px 9px; border-radius:8px; color:#ffcfae; }}
+  .chipy {{ position:absolute; bottom:14px; right:14px; font-size:13px;
+            background:rgba(8,10,14,.62); border:1px solid rgba(255,255,255,.12);
+            padding:4px 10px; border-radius:8px; }}
+  .meta {{ padding:16px 18px 18px; }}
+  .specs {{ display:flex; flex-wrap:wrap; gap:7px; font-size:12px; color:var(--dim); }}
+  .specs span {{ background:var(--panel2); border:1px solid var(--line); border-radius:7px;
+                 padding:3px 8px; }}
+  .act {{ font-size:14.5px; line-height:1.75; margin:12px 0 10px; color:#dfe4ec; }}
+  .facts {{ margin:0; padding-left:0; list-style:none; font-size:12.5px; color:var(--dim);
+            display:grid; gap:5px; }}
+  .facts b {{ display:inline-block; min-width:74px; color:#c7cedb; font-weight:600; }}
+  .note {{ font-size:12px; line-height:1.7; color:#7f8899; margin:12px 0 0;
+           border-left:2px solid #2f3646; padding-left:10px; }}
+  .links {{ display:flex; gap:8px; margin-top:14px; }}
+  .links a {{ font-size:12px; border:1px solid var(--line); border-radius:8px;
+              padding:5px 10px; color:#cfd6e2; }}
+  .links a:hover {{ border-color:var(--orange); color:var(--orange); }}
+  section {{ margin-top:64px; }}
+  h2 {{ font-size:22px; margin:0 0 8px; }}
+  .sub {{ color:var(--dim); font-size:13.5px; margin:0 0 20px; line-height:1.7; }}
+  .wide img {{ width:100%; border-radius:16px; border:1px solid var(--line); display:block; }}
+  .strips {{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }}
+  .stripf {{ margin:0; background:var(--panel); border:1px solid var(--line);
+             border-radius:14px; overflow:hidden; }}
+  .stripf img {{ width:100%; display:block; }}
+  .stripf figcaption, figure figcaption {{ padding:9px 12px; font-size:12px; color:var(--dim); }}
+  .masks {{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }}
+  .masks figure {{ margin:0; background:var(--panel); border:1px solid var(--line);
+                   border-radius:12px; overflow:hidden; }}
+  .masks img {{ width:100%; display:block; }}
+  table {{ width:100%; border-collapse:collapse; font-size:13px;
+           background:var(--panel); border-radius:14px; overflow:hidden; }}
+  th,td {{ padding:11px 12px; text-align:left; border-bottom:1px solid var(--line); }}
+  th {{ color:var(--dim); font-weight:600; font-size:12px; letter-spacing:.04em; }}
+  td.ok {{ color:var(--mint); }}
+  .cols {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; }}
+  .box {{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }}
+  .box h3 {{ margin:0 0 10px; font-size:15px; }}
+  .box p, .box li {{ font-size:13px; line-height:1.85; color:var(--dim); }}
+  .box b {{ color:var(--text); }}
+  .box ul {{ margin:0; padding-left:18px; }}
+  footer {{ border-top:1px solid var(--line); padding:26px 40px 60px; color:#6c7484;
+            font-size:12px; line-height:1.8; }}
+  .warn {{ color:#ffb27a; }}
+  @media (max-width:1180px) {{
+    .strips {{ grid-template-columns:1fr; }}
+    .masks {{ grid-template-columns:repeat(2,1fr); }}
+  }}
+  @media (max-width:720px) {{
+    header, main {{ padding-left:18px; padding-right:18px; }}
+    .grid {{ grid-template-columns:1fr; }}
+    .masks {{ grid-template-columns:1fr; }}
+  }}
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">TRAE 宝表情包 · 重制版</div>
+  <h1>六连发 · 收到 / 思考 / 震惊 / 累瘫 / 冲刺 / 辛苦啦</h1>
+  <p class="lede">
+    以你已有的 v5 高清原画为视觉基准，用 <b>局部图层 + 遮罩 + 仿射/位移场</b> 重做动画：
+    拳头真的抬起来、视线真的会游移、纸片真的在翻飞、披风真的在波动。
+    不是旧版那种整图旋转与上下浮动，也没有把角色降级成低分辨率像素图。
+    每张 512×512、1:1、无缝循环，同时提供 GIF 与全彩 WebP。
+  </p>
+  <div class="bar">
+    <button id="playWebp" class="on">播放 WebP（推荐）</button>
+    <button id="playGif">播放 GIF</button>
+    <button id="pauseAll">暂停看细节（静帧）</button>
+    <button id="replay">重播</button>
+  </div>
+</header>
+
+<main>
+  <section id="set">
+    <h2>六张成片</h2>
+    <p class="sub">默认加载 WebP（全彩、渐变最完整）。切到 GIF 可对照调色板版本的实际观感。</p>
+    <div class="grid">{cards_html()}
+    </div>
+  </section>
+
+  <section id="compare" class="wide">
+    <h2>新旧对照</h2>
+    <p class="sub">上排是既有的 ChatGPT 生成原画（仅作为视觉基准，未改动）；下排是本次重建后的动作峰值帧。
+      原画的纹理、阴影、服装、构图全部保留，变化集中在动作与特效上。</p>
+    <img src="对照_旧版与重制.png" alt="旧版与重制版对照">
+  </section>
+
+  <section id="check">
+    <h2>实测规格与质检</h2>
+    <p class="sub">数据由 <code>scripts/verify_outputs.py</code> 解码每张 GIF 后统计，不是手工填写的估计值。
+      “帧变化占比”指相邻帧中差异超过 4 级的像素比例，用来判断是否真的在动。</p>
+    <table>
+      <thead><tr><th>表情</th><th>尺寸</th><th>帧数</th><th>时长</th><th>GIF 体积</th>
+        <th>帧变化（最小/平均）</th><th>首尾差异</th><th>结论</th></tr></thead>
+      <tbody>
+{table_rows()}
+      </tbody>
+    </table>
+  </section>
+
+  <section id="process">
+    <h2>动作分镜</h2>
+    <p class="sub">每张从成片里抽 6 个时间点，用来看动作是否连贯（图片来自最终 GIF 解码帧）。</p>
+    <div class="strips">{strips_html()}
+    </div>
+  </section>
+
+  <section id="masks">
+    <h2>分层与遮罩核对</h2>
+    <p class="sub">构建脚本 <code>--debug</code> 输出：把参与运动的图层直接涂在原画上，逐张核对范围是否贴合。</p>
+    <div class="masks">{masks_html()}
+    </div>
+  </section>
+
+  <section id="tech">
+    <h2>做法与边界</h2>
+    <div class="cols">
+      <div class="box">
+        <h3>实际采用的技术</h3>
+        <ul>
+          <li>屏幕眼睛按亮度阈值 + 连通域提取，单独做缩放/位移/变暗/发光。</li>
+          <li>拳、手、纸片、披风、爱心按多边形或颜色提取，再用仿射变换驱动。</li>
+          <li>披风使用逐像素位移场，位移在边界衰减为 0，边缘不会开裂。</li>
+          <li>24–32 帧的关键帧曲线 + smoothstep 缓动编排节奏，所有时间函数在首尾周期闭合。</li>
+          <li>GIF 统一调色板 + 固定蓝噪声抖动（噪声不随时间变化，所以不会闪烁）。</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>没有做的事</h3>
+        <p>这不是骨骼动画，也没有重绘角色本体。角色是单张原画，抬臂本质是
+          “围绕支点的局部放大/旋转”，不是关节链驱动；因此大幅度的换姿势（比如整条手臂从桌面抬到头顶）
+          无法在不破坏原画质感的前提下完成。</p>
+        <p>若要继续升级，可行的下一步是：对角色做分层重绘（头/胸/左右臂/腿）并绑定 2D 骨骼，
+          或用图生视频生成连续动作后逐帧合成。</p>
+      </div>
+      <div class="box">
+        <h3>来源说明</h3>
+        <p><b>既有素材（非本次生成）</b>：<code>../TRAE宝表情包v5/*_原画.png</code> 六张 512×512 原画，
+          由用户此前用 ChatGPT 生成并保存，本次仅读取，未修改原文件。</p>
+        <p><b>本次新增</b>：分层、遮罩、动画编排、特效、调色、导出、预览与质检，全部由
+          <code>scripts/</code> 下的脚本生成。</p>
+        <p class="warn">旧版 v5 的 GIF 是整图旋转+浮动；本页所有 GIF 均为本次重新渲染，不是旧文件改名或转码。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="source">
+    <h2>活动与投稿状态</h2>
+    <div class="box">
+      <p>活动原文要求：使用 TRAE 完成主要创作、至少六张，并在「案例与作品」单独发帖、加
+        <b>“TRAE宝表情包小赛”</b> 标签。</p>
+      <p>当前状态：<b>只完成重制与证据留存，没有代发帖</b>。投稿与否、是否满足参赛资格由你自行判断与操作。
+        本页与 <code>制作记录.md</code> 可作为过程证据，但活动方是否认可仍以其审核为准。</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  TRAE宝表情包重制版 · 六张 512×512 循环动图 · 生成脚本与质检脚本见 scripts/ ·
+  原画版权与角色归属以官方及原作者说明为准。
+</footer>
+
+<script>
+  const cards = [...document.querySelectorAll('.card')];
+  const setMode = (mode) => {{
+    cards.forEach(c => {{
+      const img = c.querySelector('img.anim');
+      img.src = c.dataset[mode];
+    }});
+    document.getElementById('playWebp').classList.toggle('on', mode === 'webp');
+    document.getElementById('playGif').classList.toggle('on', mode === 'gif');
+    document.getElementById('pauseAll').classList.remove('on');
+  }};
+  document.getElementById('playWebp').onclick = () => setMode('webp');
+  document.getElementById('playGif').onclick = () => setMode('gif');
+  document.getElementById('pauseAll').onclick = () => {{
+    cards.forEach(c => c.querySelector('img.anim').src = c.dataset.still);
+    document.getElementById('playWebp').classList.remove('on');
+    document.getElementById('playGif').classList.remove('on');
+    document.getElementById('pauseAll').classList.add('on');
+  }};
+  document.getElementById('replay').onclick = () => {{
+    const mode = document.getElementById('playGif').classList.contains('on') ? 'gif' : 'webp';
+    cards.forEach(c => {{
+      const img = c.querySelector('img.anim');
+      img.removeAttribute('src');
+      setTimeout(() => {{ img.src = c.dataset[mode]; }}, 30);
+    }});
+  }};
+</script>
+</body>
+</html>
+"""
+
+
+def main():
+    (ROOT / "预览.html").write_text(HTML, encoding="utf-8")
+    print("预览.html", len(HTML), "bytes")
+
+
+if __name__ == "__main__":
+    main()

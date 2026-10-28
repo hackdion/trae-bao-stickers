@@ -1,0 +1,12 @@
+=== Seed 01 收到 · 运行与检查记录（终版）===
+输出/01_收到_静帧.png
+  size=(512, 512) mode=RGB format=PNG frames=1 loop=None bytes=107147 sha256:741694c308c085fa
+输出/01_收到_动态.gif
+  size=(512, 512) mode=RGB format=GIF frames=48 loop=0 bytes=1557951 sha256:4ac5e78fe114973d
+输出/01_收到_动态.webp
+  size=(512, 512) mode=RGBA format=WEBP frames=48 loop=0 bytes=450340 sha256:d8fb874752719520
+源文件/01_收到_静帧_超采样1536.png
+  size=(1536, 1536) mode=RGBA format=PNG frames=1 loop=None bytes=419051 sha256:1a80f7a5e117d7a8
+GIF 各帧 duration(ms): [40]
+WebP ANMF 块数=48，首帧 duration 字段=40ms（loop=0）
+源帧 首末平均像素差(0=完全一致): 0.522

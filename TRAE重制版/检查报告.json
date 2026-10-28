@@ -1,0 +1,290 @@
+[
+  {
+    "id": "01",
+    "name": "收到",
+    "gif": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 1406392,
+      "frames": 24,
+      "duration_ms": 1200,
+      "per_frame_ms": [
+        50
+      ],
+      "loop": 0,
+      "palette_colors": 256
+    },
+    "motion": {
+      "min_consecutive_diff": 0.107,
+      "max_consecutive_diff": 6.455,
+      "mean_consecutive_diff": 1.4,
+      "min_changed_pixel_ratio": 0.0113,
+      "mean_changed_pixel_ratio": 0.0991,
+      "loop_seam_diff_first_vs_last": 0.113,
+      "loop_seam_changed_ratio": 0.0117
+    },
+    "webp": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 617312,
+      "frames": 24,
+      "duration_ms": 1200,
+      "per_frame_ms": [
+        50
+      ],
+      "loop": 0
+    },
+    "png": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 329533
+    },
+    "problems": []
+  },
+  {
+    "id": "02",
+    "name": "思考",
+    "gif": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 2140402,
+      "frames": 30,
+      "duration_ms": 1500,
+      "per_frame_ms": [
+        50
+      ],
+      "loop": 0,
+      "palette_colors": 256
+    },
+    "motion": {
+      "min_consecutive_diff": 0.095,
+      "max_consecutive_diff": 2.501,
+      "mean_consecutive_diff": 1.349,
+      "min_changed_pixel_ratio": 0.0059,
+      "mean_changed_pixel_ratio": 0.1067,
+      "loop_seam_diff_first_vs_last": 1.921,
+      "loop_seam_changed_ratio": 0.1649
+    },
+    "webp": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 1079936,
+      "frames": 30,
+      "duration_ms": 1500,
+      "per_frame_ms": [
+        50
+      ],
+      "loop": 0
+    },
+    "png": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 336698
+    },
+    "problems": []
+  },
+  {
+    "id": "03",
+    "name": "震惊",
+    "gif": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 2627274,
+      "frames": 24,
+      "duration_ms": 960,
+      "per_frame_ms": [
+        40
+      ],
+      "loop": 0,
+      "palette_colors": 256
+    },
+    "motion": {
+      "min_consecutive_diff": 0.078,
+      "max_consecutive_diff": 12.86,
+      "mean_consecutive_diff": 3.997,
+      "min_changed_pixel_ratio": 0.0096,
+      "mean_changed_pixel_ratio": 0.2403,
+      "loop_seam_diff_first_vs_last": 0.084,
+      "loop_seam_changed_ratio": 0.0113
+    },
+    "webp": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 843006,
+      "frames": 24,
+      "duration_ms": 960,
+      "per_frame_ms": [
+        40
+      ],
+      "loop": 0
+    },
+    "png": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 364118
+    },
+    "problems": []
+  },
+  {
+    "id": "04",
+    "name": "累瘫",
+    "gif": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 2271440,
+      "frames": 32,
+      "duration_ms": 1920,
+      "per_frame_ms": [
+        60
+      ],
+      "loop": 0,
+      "palette_colors": 256
+    },
+    "motion": {
+      "min_consecutive_diff": 0.452,
+      "max_consecutive_diff": 1.83,
+      "mean_consecutive_diff": 1.155,
+      "min_changed_pixel_ratio": 0.0357,
+      "mean_changed_pixel_ratio": 0.1087,
+      "loop_seam_diff_first_vs_last": 0.486,
+      "loop_seam_changed_ratio": 0.0385
+    },
+    "webp": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 773878,
+      "frames": 32,
+      "duration_ms": 1920,
+      "per_frame_ms": [
+        60
+      ],
+      "loop": 0
+    },
+    "png": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 306416
+    },
+    "problems": []
+  },
+  {
+    "id": "05",
+    "name": "冲刺",
+    "gif": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 2968669,
+      "frames": 20,
+      "duration_ms": 800,
+      "per_frame_ms": [
+        40
+      ],
+      "loop": 0,
+      "palette_colors": 256
+    },
+    "motion": {
+      "min_consecutive_diff": 3.134,
+      "max_consecutive_diff": 10.909,
+      "mean_consecutive_diff": 6.885,
+      "min_changed_pixel_ratio": 0.2442,
+      "mean_changed_pixel_ratio": 0.3751,
+      "loop_seam_diff_first_vs_last": 5.076,
+      "loop_seam_changed_ratio": 0.3282
+    },
+    "webp": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 1004360,
+      "frames": 20,
+      "duration_ms": 800,
+      "per_frame_ms": [
+        40
+      ],
+      "loop": 0
+    },
+    "png": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 367686
+    },
+    "problems": []
+  },
+  {
+    "id": "06",
+    "name": "辛苦啦",
+    "gif": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 1337469,
+      "frames": 30,
+      "duration_ms": 1500,
+      "per_frame_ms": [
+        50
+      ],
+      "loop": 0,
+      "palette_colors": 256
+    },
+    "motion": {
+      "min_consecutive_diff": 0.153,
+      "max_consecutive_diff": 2.119,
+      "mean_consecutive_diff": 0.688,
+      "min_changed_pixel_ratio": 0.0241,
+      "mean_changed_pixel_ratio": 0.0839,
+      "loop_seam_diff_first_vs_last": 0.168,
+      "loop_seam_changed_ratio": 0.0276
+    },
+    "webp": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 714654,
+      "frames": 30,
+      "duration_ms": 1500,
+      "per_frame_ms": [
+        50
+      ],
+      "loop": 0
+    },
+    "png": {
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 334143
+    },
+    "problems": []
+  }
+]
